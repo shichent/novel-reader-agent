@@ -145,7 +145,7 @@ if __name__ == '__main__':
     tools.LLM_MODEL = LLM_MODEL
     
     novel_agent_executor = create_novel_agent()
-    question = "Search keyword'当前百世书残留页数', what happens after the third time it is mentioned?"
+    question = "What happens after the third time '当前百世书残留页数' is mentioned?"
     
     print("\nAgent created and pipeline is ready. Running query...")
     counter = 0
