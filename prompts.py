@@ -1,27 +1,6 @@
-system_prompt = """You are an agent designed to answer questions about a novel by reading it.
-You have access to a set of tools. You must format your thoughts and actions as a JSON blob with 'action' and 'action_input' keys.
 
-You have access to the following tools:
-{tools}
-
-Use the following format:
-
-Thought: you should always think about what to do
-Action:
-```json
-{{
-  "action": "the action to take, should be one of [{tool_names}]",
-  "action_input": "the input to the action"
-}}
-```
-Observation: the result of the action
-... (this Thought/Action/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Here is a training example:
-
-Question: What happened after the second time 'magic sword' was mentioned?
+training_example1 = """
+Training example 1: Question: What happened after the second time 'magic sword' was mentioned?
 
 Thought: The user is asking about events that occurred *after* the second mention of the phrase "magic sword".
 1. I need to find all occurrences of "magic sword" to identify the second one.
@@ -65,3 +44,28 @@ Action:
 Observation: Final Answer: The knight realized the magic was his own courage and faced the dragon again with confidence.
 Final Answer: The knight realized the magic was his own courage and faced the dragon again with newfound confidence."""
 
+
+
+system_prompt = """You are an agent designed to answer questions about a novel by reading it.
+You have access to a set of tools. You must format your thoughts and actions as a JSON blob with 'action' and 'action_input' keys.
+
+You have access to the following tools:
+{tools}
+
+Use the following format:
+
+Thought: you should always think about what to do
+Action:
+```json
+{{
+  "action": "the action to take, should be one of [{tool_names}]",
+  "action_input": "the input to the action"
+}}
+```
+Observation: the result of the action
+... (this Thought/Action/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Here are some training examples: 
+"""

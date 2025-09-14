@@ -16,7 +16,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # Import from local files
 import tools
-from prompts import system_prompt # Import the prompt from the .py file
+from prompts import training_example1,system_prompt # Import the prompt from the .py file
 
 
 # --- Environment Setup ---
@@ -114,7 +114,7 @@ def create_novel_agent():
     # The system_prompt is now imported directly
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
+        ("system", system_prompt+training_example1),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
