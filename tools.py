@@ -22,52 +22,53 @@ def find_position_by_keyword(keyword: str) -> list[int]:
             positions.append(i)
     return positions
 
-@tool
-def manipulate_position_list(positions: list[int], action: str) -> list[int]:
-    """
-    Filters or selects positions from a list.
-    Valid actions:
-    - 'select_index_n:<n>' (e.g., 'select_index_n:1' for the second element)
-    - 'select_after_index_n:<n>' (e.g., 'select_after_index_n:1')
-    """
-    parts = action.split(':')
-    op = parts[0]
-    if op == 'select_index_n' and len(parts) > 1:
-        try:
-            index = int(parts[1])
-            if 0 <= index < len(positions):
-                return [positions[index]]
-            else:
-                return []
-        except (ValueError, IndexError):
-            return []
-    elif op == 'select_after_index_n' and len(parts) > 1:
-        try:
-            index = int(parts[1])
-            if 0 <= index < len(positions):
-                start_pos = positions[index]
-                # Assuming we want the next few chunks
-                return list(range(start_pos, min(start_pos + 10, len(TEXT_CHUNKS))))
-            else:
-                return []
-        except (ValueError, IndexError):
-            return []
-    return []
+# @tool
+# def manipulate_position_list(positions: list[int], action: str) -> list[int]:
+#     """
+#     Filters or selects positions from a list.
+#     Valid actions:
+#     - 'select_index_n:<n>' (e.g., 'select_index_n:1' for the second element)
+#     - 'select_after_index_n:<n>' (e.g., 'select_after_index_n:1')
+#     """
+#     parts = action.split(':')
+#     op = parts[0]
+#     if op == 'select_index_n' and len(parts) > 1:
+#         try:
+#             index = int(parts[1])
+#             if 0 <= index < len(positions):
+#                 return [positions[index]]
+#             else:
+#                 return []
+#         except (ValueError, IndexError):
+#             return []
+#     elif op == 'select_after_index_n' and len(parts) > 1:
+#         try:
+#             index = int(parts[1])
+#             if 0 <= index < len(positions):
+#                 start_pos = positions[index]
+#                 # Assuming we want the next few chunks
+#                 return list(range(start_pos, min(start_pos + 10, len(TEXT_CHUNKS))))
+#             else:
+#                 return []
+#         except (ValueError, IndexError):
+#             return []
+#     return []
 
 @tool
-def answer_question(positions: list[int], question: str) -> str:
+def retrieve_text_chunks(positions: list[int]) -> str:
     """
-    Answers a question based on the provided context.
+    Retrieves text chunks at the specified positions.
+    Returns concatenated text of those chunks and their indices.
     """
-    context = "\n".join([TEXT_CHUNKS[i] for i in positions if 0 <= i < len(TEXT_CHUNKS)])
-    llm = ChatOpenAI(model=LLM_MODEL)
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a helpful assistant. Answer the user's question based on the following context. Be concise and directly answer the question. Answer the question in the language same as the context."),
-        ("human", "Context:\n{context}\n\nQuestion: {question}")
-    ])
-    llm = ChatOpenAI(model=LLM_MODEL)
-    chain = prompt | llm
-    response = chain.invoke({"context": context, "question": question})
-    return "Final Answer: "+response.content
+    ans = ''
+    for pos in positions:
+        if 0 <= pos < len(TEXT_CHUNKS):
+            ans += f"{pos}: {TEXT_CHUNKS[pos]} "
+    return ans.strip()
 
-
+@tool
+def final_answer(answer: str) -> str:
+    """
+    Returns the final answer.
+    """
+    return answer
