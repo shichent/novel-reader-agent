@@ -72,14 +72,18 @@ def create_novel_agent():
 
 if __name__ == '__main__':
     # --- Setup and Run ---
+    working_dir = "assets/book1"
     novel_name = "1.txt"
     question = "What happens after the third time '当前百世书残留页数' is mentioned?"
     verbose = True
-    rag.setup_rag_pipeline("assets/"+novel_name)
+    rag.setup_rag_pipeline(working_dir+novel_name)
+    graph_func = rag.setup_graphrag(file_name=novel_name,working_dir=working_dir)
 
     # Pass necessary data to the tools module after it's loaded
     tools.TEXT_CHUNKS = rag.TEXT_CHUNKS
     tools.LLM_MODEL = LLM_MODEL
+    tools.EMBEDDING_MODEL = EMBEDDING_MODEL
+    tools.FAISS_INDEX = rag.FAISS_INDEX
     
     novel_agent_executor = create_novel_agent()
     

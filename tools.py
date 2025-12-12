@@ -2,13 +2,19 @@ from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from openai import OpenAI
+import numpy as np
+
+from nano_graphrag import GraphRAG, QueryParam
+import rag
 
 # Initialize the OpenAI client for use in this module
 client = OpenAI()
 
 # This list will be populated when setup_rag_pipeline is called from the main script.
 TEXT_CHUNKS = []
-LLM_MODEL = "gpt-5-mini"
+LLM_MODEL = "gpt-5"
+EMBEDDING_MODEL = "text-embedding-3-small"
+FAISS_INDEX = None
 
 @tool
 def find_position_by_keyword(keyword: str) -> list[int]:
@@ -21,6 +27,30 @@ def find_position_by_keyword(keyword: str) -> list[int]:
         if keyword in chunk:
             positions.append(i)
     return positions
+
+@tool
+def simple_rag_search(query: str, top_k: int = 5) -> str:
+    """
+    Performs a simple RAG search to find the top_k most relevant text chunks for the query. Use this tools to find relevant exact keywords related to an ambiguous query.
+    Returns concatenated text of those chunks.
+    """
+    if FAISS_INDEX is None:
+        return "FAISS index not initialized."
+
+    # Get embedding for the query
+    resp = client.embeddings.create(model=EMBEDDING_MODEL, input=[query])
+    query_embedding = resp.data[0].embedding
+
+    # Search in FAISS index
+    D, I = FAISS_INDEX.search(np.array([query_embedding]), top_k)
+    
+    # Retrieve and concatenate the relevant text chunks
+    results = []
+    for idx in I[0]:
+        if 0 <= idx < len(TEXT_CHUNKS):
+            results.append(f"{idx}: {TEXT_CHUNKS[idx]}")
+    
+    return " ".join(results)
 
 # @tool
 # def manipulate_position_list(positions: list[int], action: str) -> list[int]:
@@ -65,6 +95,15 @@ def retrieve_text_chunks(positions: list[int]) -> str:
         if 0 <= pos < len(TEXT_CHUNKS):
             ans += f"{pos}: {TEXT_CHUNKS[pos]} "
     return ans.strip()
+
+@tool
+def answer_question_with_graphrag(question: str, graph_func: GraphRAG) -> str:
+    """
+    Uses GraphRAG to answer a question based on the inserted text data.
+    """
+    query_param = QueryParam(query=question, top_k=5)
+    response = graph_func.query(query_param)
+    return response
 
 @tool
 def final_answer(answer: str) -> str:

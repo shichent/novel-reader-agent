@@ -7,6 +7,7 @@ from typing import List
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
 import sqlite3
+from nano_graphrag import GraphRAG, QueryParam
 
 import faiss
 from openai import OpenAI
@@ -99,3 +100,10 @@ def setup_rag_pipeline(file_path: str, chunk_size: int = 500):
     FAISS_INDEX = faiss.IndexFlatL2(embedding_dim)
     FAISS_INDEX.add(np.array(embeddings).astype('float32'))
     print("--- RAG Pipeline is READY ---")
+
+def setup_graphrag(file_name:str,working_dir:str):
+    graph_func = GraphRAG(working_dir=working_dir)
+
+    with open(working_dir+file_name) as f:
+        graph_func.insert(f.read())
+    return graph_func
