@@ -104,6 +104,6 @@ def setup_rag_pipeline(file_path: str, chunk_size: int = 500):
 def setup_graphrag(file_name:str,working_dir:str):
     graph_func = GraphRAG(working_dir=working_dir)
 
-    with open(working_dir+file_name) as f:
+    with open(working_dir+file_name,encoding='utf-8') as f:
         graph_func.insert(f.read())
     return graph_func

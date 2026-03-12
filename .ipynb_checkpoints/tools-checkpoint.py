@@ -96,22 +96,14 @@ def retrieve_text_chunks(positions: list[int]) -> str:
             ans += f"{pos}: {TEXT_CHUNKS[pos]} "
     return ans.strip()
 
-def make_graphrag_tool(graph_func: GraphRAG):
-    """Factory that closes over graph_func so it's not a tool parameter.
-    In LangChain 1.0, all @tool function parameters are introspected and converted to a Pydantic JSON schema 
-    to register with the LLM. GraphRAG contains a callable field internally, which Pydantic 2 can't serialize
+@tool
+def answer_question_with_graphrag(question: str, graph_func: GraphRAG) -> str:
     """
-    
-    @tool
-    def answer_question_with_graphrag(question: str) -> str:
-        """
-        Uses GraphRAG to answer a question based on the inserted text data.
-        """
-        query_param = QueryParam(query=question, top_k=5)
-        response = graph_func.query(query_param)
-        return response
-    
-    return answer_question_with_graphrag
+    Uses GraphRAG to answer a question based on the inserted text data.
+    """
+    query_param = QueryParam(query=question, top_k=5)
+    response = graph_func.query(query_param)
+    return response
 
 @tool
 def final_answer(answer: str) -> str:
